@@ -88,7 +88,8 @@ async def list_writings(request: Request, db: AsyncSession = Depends(get_db)):
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")
     
-    result = await db.execute(select(Writing).where(Writing.user_id==user.id))
+    #result = await db.execute(select(Writing).where(Writing.user_id==user.id))
+    result = await db.execute(select(Writing))
     writings = result.scalars().all()
     return templates.TemplateResponse("writings.html", {"request": request, "writings": writings, "username": username})
 

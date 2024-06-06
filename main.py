@@ -23,4 +23,4 @@ templates = Jinja2Templates(directory="templates")
 
 @app.get('/')
 async def read_root(request: Request):
-    return templates.TemplateResponse('home.html', {"request": request})
+    return templates.TemplateResponse('loginSignUp.html', {"request": request})

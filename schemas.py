@@ -14,10 +14,10 @@ class UserLogin(BaseModel):
     username: str
     password: str # 해시 전 패스워드를 받습니다.
 
-class WritingCreate(BaseModel):
+class FreeCreate(BaseModel):
     title: str
     content: str
 
-class WritingUpdate(BaseModel):
+class FreeUpdate(BaseModel):
     title: Optional[str] = None
     content: Optional[str] = None

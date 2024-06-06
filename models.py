@@ -9,9 +9,10 @@ class User(Base):
     email = Column(String(200))
     hashed_password = Column(String(512))
 
-class Writing(Base):
-    __tablename__ = 'writing'
+class Free(Base):
+    __tablename__ = 'free'
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey('users.id'))
+    username = Column(String(100), ForeignKey('users.username'))
     title = Column(String(100))
     content = Column(String(1000))

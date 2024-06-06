@@ -1,12 +1,13 @@
 from fastapi import APIRouter, Request, Depends, HTTPException
-from schemas import UserCreate, UserLogin, WritingCreate, WritingUpdate
-from models import User, Writing
+from schemas import UserCreate, UserLogin, FreeCreate, FreeUpdate
+from models import User, Free
 from dependencies import get_db, get_password_hash, verify_password
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from database import Base, engine
+from fastapi.responses import RedirectResponse
 
 # API 들 나열 - 컨트롤러의 핵심
 
@@ -59,8 +60,8 @@ async def logout(request: Request):
 
 
 ## 글쓰기 - 비동기 처리
-@router.post("/writings/")
-async def create_writing(request: Request, writing: WritingCreate, db: AsyncSession = Depends(get_db)):
+@router.post("/frees/")
+async def create_free(request: Request, free: FreeCreate, db: AsyncSession = Depends(get_db)):
     username = request.session.get("username") # 쿠키에서 가져온 username
     if username is None:
         raise HTTPException(status_code=401, detail="Not authorized")
@@ -71,15 +72,15 @@ async def create_writing(request: Request, writing: WritingCreate, db: AsyncSess
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")
 
-    new_writing = Writing(user_id=user.id, title=writing.title, content=writing.content)
-    db.add(new_writing) # 여기는 db를 직접 쓰는 부분이 아니라 await안씀
+    new_free = Free(user_id=user.id, username=username, title=free.title, content=free.content)
+    db.add(new_free) # 여기는 db를 직접 쓰는 부분이 아니라 await안씀
     await db.commit()
-    await db.refresh(new_writing)
-    return new_writing
+    await db.refresh(new_free)
+    return new_free
 
 ## 글조회 - 비동기 처리
-@router.get("/writings/")
-async def list_writings(request: Request, db: AsyncSession = Depends(get_db)):
+@router.get("/frees/")
+async def list_frees(request: Request, db: AsyncSession = Depends(get_db)):
     username = request.session.get("username") # 쿠키에서 가져온 username
     if username is None:
         raise HTTPException(status_code=401, detail="Not authorized")
@@ -88,14 +89,14 @@ async def list_writings(request: Request, db: AsyncSession = Depends(get_db)):
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")
     
-    #result = await db.execute(select(Writing).where(Writing.user_id==user.id))
-    result = await db.execute(select(Writing))
-    writings = result.scalars().all()
-    return templates.TemplateResponse("writings.html", {"request": request, "writings": writings, "username": username})
+    #result = await db.execute(select(Free).where(Free.user_id==user.id))
+    result = await db.execute(select(Free))
+    frees = result.scalars().all()
+    return templates.TemplateResponse("frees.html", {"request": request, "frees": frees, "username": username})
 
 ## 글 수정 - 비동기 처리
-@router.put("/writings/{writing_id}")
-async def update_writing(request: Request, writing_id: int, writing: WritingUpdate, db: AsyncSession=Depends(get_db)):
+@router.put("/frees/{free_id}")
+async def update_free(request: Request, free_id: int, free: FreeUpdate, db: AsyncSession=Depends(get_db)):
     username = request.session.get("username") # 쿠키에서 가져온 username
     if username is None:
         raise HTTPException(status_code=401, detail="Not authorized")
@@ -104,23 +105,23 @@ async def update_writing(request: Request, writing_id: int, writing: WritingUpda
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")
     
-    result = await db.execute(select(Writing).where(Writing.user_id==user.id, writing_id==Writing.id))
-    db_writing = result.scalars().first()
-    if db_writing is None:
+    result = await db.execute(select(Free).where(Free.user_id==user.id, free_id==Free.id))
+    db_free = result.scalars().first()
+    if db_free is None:
         return {"error": "Writing not found"}
    
-    if writing.title is not None:
-        db_writing.title = writing.title 
-    if writing.content is not None:
-        db_writing.content = writing.content
+    if free.title is not None:
+        db_free.title = free.title 
+    if free.content is not None:
+        db_free.content = free.content
     
     await db.commit()
-    await db.refresh(db_writing) 
-    return db_writing
+    await db.refresh(db_free) 
+    return db_free
   
 ## 글 삭제 - 비동기 처리
-@router.delete("/writings/{writing_id}")
-async def delete_writing(request: Request, writing_id: int, db: AsyncSession=Depends(get_db)):
+@router.delete("/frees/{free_id}")
+async def delete_free(request: Request, free_id: int, db: AsyncSession=Depends(get_db)):
     username = request.session.get("username") # 쿠키에서 가져온 username
     if username is None:
         raise HTTPException(status_code=401, detail="Not authorized")
@@ -129,14 +130,22 @@ async def delete_writing(request: Request, writing_id: int, db: AsyncSession=Dep
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")
     
-    result = await db.execute(select(Writing).where(Writing.user_id==user.id, writing_id==Writing.id))
-    db_writing = result.scalars().first()
-    if db_writing is None:
+    result = await db.execute(select(Free).where(Free.user_id==user.id, free_id==Free.id))
+    db_free = result.scalars().first()
+    if db_free is None:
         return {"error": "Writing not found"}
    
-    await db.delete(db_writing)
+    await db.delete(db_free)
     await db.commit()
     return {"message": "Writing deleted"}
+
+# 홈화면 조회
+@router.get("/home")
+async def list_boards(request: Request):
+    username = request.session.get("username")
+    if username is None:
+        return RedirectResponse(url="/")
+    return templates.TemplateResponse("home.html", {"request": request})
 
 @router.get("/about")
 async def about():

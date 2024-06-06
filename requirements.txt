@@ -1,0 +1,7 @@
+fastapi
+sqlalchemy==1.4.39
+pymysql==1.1.0
+itsdangerous
+passlib[bcrypt]
+bcrypt==4.0.1
+aiomysql

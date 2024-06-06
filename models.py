@@ -16,3 +16,19 @@ class Free(Base):
     username = Column(String(100), ForeignKey('users.username'))
     title = Column(String(100))
     content = Column(String(1000))
+
+class Question(Base):
+    __tablename__ = 'question'
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey('users.id'))
+    username = Column(String(100), ForeignKey('users.username'))
+    title = Column(String(100))
+    content = Column(String(1000))
+
+class Share(Base):
+    __tablename__ = 'share'
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey('users.id'))
+    username = Column(String(100), ForeignKey('users.username'))
+    title = Column(String(100))
+    content = Column(String(1000))

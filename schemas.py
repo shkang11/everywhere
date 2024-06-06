@@ -21,3 +21,19 @@ class FreeCreate(BaseModel):
 class FreeUpdate(BaseModel):
     title: Optional[str] = None
     content: Optional[str] = None
+
+class QuestionCreate(BaseModel):
+    title: str
+    content: str
+
+class QuestionUpdate(BaseModel):
+    title: Optional[str] = None
+    content: Optional[str] = None
+
+class ShareCreate(BaseModel):
+    title: str
+    content: str
+
+class ShareUpdate(BaseModel):
+    title: Optional[str] = None
+    content: Optional[str] = None

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>에브리웨어 - 홈</title>
+    <!-- 여기에 필요한 CSS 링크 추가 -->
+    <style>
+        /* 추가한 CSS */
+        section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        /* 로그아웃 버튼 CSS */
+        .logout-button {
+            background-color: #f44336; /* Red */
+            border: none;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+        }
+        /* 헤더 CSS 수정 */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>에브리웨어</h1>
+        <!-- 로그아웃 버튼 추가 -->
+        <button class="logout-button" onclick="logout()">로그아웃</button>
+    </header>
+    <main>
+        <section>
+            <h2>우리 아파트 자유게시판</h2>
+            <a href="/frees">더보기</a>
+        </section>
+        <section>
+            <h2>주민에게 질문해요</h2>
+            <a href="/questions">더보기</a>
+        </section>
+        <section>
+            <h2>우리 동네 나눔해요</h2>
+            <a href="/shares">더보기</a>
+        </section>
+    </main>
+    <footer>
+        <!-- 여기에 필요한 푸터 내용 추가 -->
+    </footer>
+    <script>
+        function logout() {
+            fetch('/logout', {
+                method: 'POST',
+            }).then(() => {
+                window.location.href = '/';
+            });
+        }
+    </script>
+</body>
+</html>
